@@ -24,7 +24,7 @@ public class Robot extends LoggedRobot {
 
   private final PneumaticHub testHub = new PneumaticHub();
   private final DoubleSolenoid testSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, 0, 1);
-  // private final Compressor testCompressor = new Compressor(PneumaticsModuleType.REVPH);
+  private final Compressor testCompressor = new Compressor(PneumaticsModuleType.REVPH);
 
 
   private Command m_autoSelected;
@@ -41,7 +41,8 @@ public class Robot extends LoggedRobot {
 
     // testSolenoid.close();
     // testCompressor.enableDigital();
-    testHub.enableCompressorDigital();
+    // testHub.enableCompressorDigital();
+    testCompressor.enableAnalog(10, 20);
     testSolenoid.set(Value.kForward);
   }
 
@@ -51,8 +52,13 @@ public class Robot extends LoggedRobot {
 
     CommandScheduler.getInstance().run();
 
-    SmartDashboard.putNumber("Current", testHub.getCompressorCurrent());
-    SmartDashboard.putNumber("Pressure", testHub.getPressure(0));
+    SmartDashboard.putNumber("Pressure", testCompressor.getPressure());
+    SmartDashboard.putNumber("Current", testCompressor.getCurrent());
+    SmartDashboard.putNumber("SolenoidR", testSolenoid.getRevChannel());
+    SmartDashboard.putNumber("SolenoidF", testSolenoid.getFwdChannel());
+
+
+    // SmartDashboard.putNumber("Pressure", testHub.getPressure(0));
     if(testSolenoid.get() == Value.kForward)
       SmartDashboard.putString("Solenoid", "kForward");
     if(testSolenoid.get() == Value.kReverse)
@@ -88,8 +94,10 @@ public class Robot extends LoggedRobot {
   public void teleopPeriodic() {
 
   
-   if(driver.getAButtonPressed()){
-    testSolenoid.toggle();
+   if(driver.getAButton()){
+    testSolenoid.set(Value.kReverse);
+   }else{
+    testSolenoid.set(Value.kForward);
    }
    
      
